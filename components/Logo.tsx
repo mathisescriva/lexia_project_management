@@ -2,14 +2,15 @@ import Image from 'next/image'
 
 interface LogoProps {
   className?: string
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
 }
 
 export default function Logo({ className = '', size = 'lg' }: LogoProps) {
   const sizeClasses = {
     sm: 'h-14 w-14',
     md: 'h-20 w-20',
-    lg: 'h-28 w-28'
+    lg: 'h-28 w-28',
+    xl: 'h-40 w-40'
   }
 
   return (

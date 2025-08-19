@@ -67,6 +67,20 @@ async function main() {
     },
   })
 
+  // Create ProMemoria client
+  const promemoriaClientPassword = await bcrypt.hash('client123', 12)
+  const promemoriaClient = await prisma.user.upsert({
+    where: { email: 'client@promemoria.com' },
+    update: {},
+    create: {
+      email: 'client@promemoria.com',
+      password: promemoriaClientPassword,
+      name: 'Sophie Bernard',
+      role: 'CLIENT',
+      companyId: company2.id, // ProMemoria est company2
+    },
+  })
+
   // Create projects
   const project1 = await prisma.project.create({
     data: {
@@ -76,6 +90,7 @@ async function main() {
       progress: 65,
       clientId: client1.id,
       adminId: admin.id,
+      companyId: company1.id,
       steps: {
         create: [
           {
@@ -130,6 +145,7 @@ async function main() {
       progress: 0,
       clientId: client2.id,
       adminId: admin.id,
+      companyId: company2.id,
       steps: {
         create: [
           {
@@ -167,6 +183,49 @@ async function main() {
     },
   })
 
+  // Create ProMemoria project
+  const project3 = await prisma.project.create({
+    data: {
+      name: 'Solution Sténotypie IA',
+      description: 'Développement d\'une solution d\'intelligence artificielle pour la sténotypie',
+      status: 'IN_PROGRESS',
+      progress: 35,
+      clientId: promemoriaClient.id,
+      adminId: admin.id,
+      companyId: company2.id, // ProMemoria
+      steps: {
+        create: [
+          {
+            title: 'Analyse des besoins',
+            description: 'Étude des processus de sténotypie existants',
+            order: 1,
+            completed: true,
+            completedAt: new Date('2024-01-10'),
+          },
+          {
+            title: 'Développement IA',
+            description: 'Création des modèles d\'IA pour la reconnaissance vocale',
+            order: 2,
+            completed: true,
+            completedAt: new Date('2024-01-20'),
+          },
+          {
+            title: 'Interface utilisateur',
+            description: 'Développement de l\'interface pour les sténotypistes',
+            order: 3,
+            completed: false,
+          },
+          {
+            title: 'Tests et validation',
+            description: 'Tests avec des sténotypistes professionnels',
+            order: 4,
+            completed: false,
+          },
+        ],
+      },
+    },
+  })
+
   // Create tickets
   await prisma.ticket.create({
     data: {
@@ -190,8 +249,9 @@ async function main() {
   console.log('✅ Database seeded successfully!')
   console.log('\n📋 Test accounts:')
   console.log('Admin: admin@lexia.com / admin123')
-  console.log('Client 1: client1@example.com / client123')
-  console.log('Client 2: client2@example.com / client123')
+  console.log('Client 1 (TechCorp): client1@example.com / client123')
+  console.log('Client 2 (DesignStudio): client2@example.com / client123')
+  console.log('Client ProMemoria: client@promemoria.com / client123')
 }
 
 main()

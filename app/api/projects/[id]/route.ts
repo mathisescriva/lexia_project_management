@@ -76,7 +76,7 @@ export async function GET(
     }
 
     // Vérifier les permissions
-    if (user.role === 'CLIENT' && project.clientId !== user.id) {
+    if (user.role === 'CLIENT' && project.companyId !== user.companyId) {
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
 

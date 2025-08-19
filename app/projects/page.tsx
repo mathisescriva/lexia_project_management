@@ -30,11 +30,11 @@ export default function ProjectsPage() {
   const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const [clients, setClients] = useState<any[]>([])
+  const [companies, setCompanies] = useState<any[]>([])
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    clientId: '',
+    companyId: '',
     startDate: '',
     endDate: '',
     steps: [
@@ -94,7 +94,7 @@ export default function ProjectsPage() {
   useEffect(() => {
     fetchProjects()
     if (user?.role === 'ADMIN') {
-      fetchClients()
+      fetchCompanies()
     }
   }, [user])
 
@@ -112,15 +112,15 @@ export default function ProjectsPage() {
     }
   }
 
-  const fetchClients = async () => {
+  const fetchCompanies = async () => {
     try {
-      const response = await fetch('/api/users?role=CLIENT')
+      const response = await fetch('/api/companies')
       if (response.ok) {
         const data = await response.json()
-        setClients(data)
+        setCompanies(data)
       }
     } catch (error) {
-      console.error('Error fetching clients:', error)
+      console.error('Error fetching companies:', error)
     }
   }
 
@@ -141,7 +141,7 @@ export default function ProjectsPage() {
         setFormData({
           name: '',
           description: '',
-          clientId: '',
+          companyId: '',
           startDate: '',
           endDate: '',
           steps: [
@@ -324,18 +324,18 @@ export default function ProjectsPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Client
+                  Entreprise
                 </label>
                 <select
                   required
                   className="input-field"
-                  value={formData.clientId}
-                  onChange={(e) => setFormData({ ...formData, clientId: e.target.value })}
+                  value={formData.companyId}
+                  onChange={(e) => setFormData({ ...formData, companyId: e.target.value })}
                 >
-                  <option value="">Sélectionner un client</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name} ({client.email})
+                  <option value="">Sélectionner une entreprise</option>
+                  {companies.map((company) => (
+                    <option key={company.id} value={company.id}>
+                      {company.name} ({company._count.users} utilisateurs, {company._count.projects} projets)
                     </option>
                   ))}
                 </select>

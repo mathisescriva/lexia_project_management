@@ -42,10 +42,15 @@ export async function GET(request: NextRequest) {
         orderBy: { updatedAt: 'desc' }
       })
     } else {
-      // Client sees only their projects
+      // Client sees projects from their company
       projects = await prisma.project.findMany({
-        where: { clientId: user.id },
+        where: { 
+          companyId: user.companyId 
+        },
         include: {
+          client: {
+            select: { id: true, name: true, email: true }
+          },
           steps: true,
           actions: {
             orderBy: { order: 'asc' }
@@ -89,11 +94,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
 
-    const { name, description, clientId, startDate, endDate, steps, actions } = await request.json()
+    const { name, description, companyId, startDate, endDate, steps, actions } = await request.json()
 
-    if (!name || !clientId) {
+    if (!name || !companyId) {
       return NextResponse.json(
-        { error: 'Nom et client requis' },
+        { error: 'Nom et entreprise requis' },
+        { status: 400 }
+      )
+    }
+
+    // Récupérer le premier client de l'entreprise pour le champ clientId (requis par le schéma)
+    const firstClient = await prisma.user.findFirst({
+      where: { 
+        companyId: companyId,
+        role: 'CLIENT'
+      },
+      select: { id: true }
+    })
+
+    if (!firstClient) {
+      return NextResponse.json(
+        { error: 'Aucun client trouvé dans cette entreprise' },
         { status: 400 }
       )
     }
@@ -104,8 +125,9 @@ export async function POST(request: NextRequest) {
         description,
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
-        clientId,
+        clientId: firstClient.id,
         adminId: user.id,
+        companyId: companyId,
         steps: {
           create: steps?.map((step: any, index: number) => ({
             title: step.title,

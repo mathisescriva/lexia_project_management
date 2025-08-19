@@ -8,6 +8,7 @@ import Comments from '@/components/Comments'
 import ContactForm from '@/components/ContactForm'
 import { 
   ArrowLeftIcon,
+  ArrowPathIcon,
   CheckCircleIcon,
   ClockIcon,
   ExclamationTriangleIcon,
@@ -384,17 +385,46 @@ export default function ProjectDetailPage() {
             <div className="card">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-medium text-gray-900">Fichiers partagés</h3>
-                {project.driveFolderUrl && (
-                  <a
-                    href={project.driveFolderUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary flex items-center"
-                  >
-                    <FolderIcon className="h-4 w-4 mr-2" />
-                    Ouvrir dans Google Drive
-                  </a>
-                )}
+                <div className="flex items-center space-x-3">
+                  {project.driveFolderUrl && (
+                    <>
+                      <button
+                        onClick={async () => {
+                          try {
+                            const response = await fetch(`/api/projects/${project.id}/sync-files`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' }
+                            })
+                            if (response.ok) {
+                              const result = await response.json()
+                              alert(result.message)
+                              // Recharger la page pour afficher les nouveaux fichiers
+                              window.location.reload()
+                            } else {
+                              const error = await response.json()
+                              alert(`Erreur: ${error.error}`)
+                            }
+                          } catch (error) {
+                            alert('Erreur lors de la synchronisation')
+                          }
+                        }}
+                        className="btn-secondary flex items-center text-sm"
+                      >
+                        <ArrowPathIcon className="h-4 w-4 mr-2" />
+                        Synchroniser
+                      </button>
+                      <a
+                        href={project.driveFolderUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary flex items-center"
+                      >
+                        <FolderIcon className="h-4 w-4 mr-2" />
+                        Ouvrir dans Google Drive
+                      </a>
+                    </>
+                  )}
+                </div>
               </div>
               
               {project.files.length === 0 ? (
@@ -403,7 +433,7 @@ export default function ProjectDetailPage() {
                   <h3 className="mt-2 text-sm font-medium text-gray-900">Aucun fichier</h3>
                   <p className="mt-1 text-sm text-gray-500">
                     {project.driveFolderUrl 
-                      ? 'Les fichiers seront affichés ici une fois partagés via Google Drive.'
+                      ? 'Cliquez sur "Synchroniser" pour récupérer les fichiers depuis Google Drive.'
                       : 'Aucun dossier Google Drive configuré pour ce projet.'
                     }
                   </p>

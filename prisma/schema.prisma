@@ -8,7 +8,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  shadowDatabaseUrl = env("DATABASE_URL")
 }
 
 model Company {
@@ -62,9 +61,9 @@ model Project {
 
   // Relations
   clientId    String
-  client      User          @relation("ProjectClient", fields: [clientId], references: [id])
+  client      User          @relation("ProjectClient", fields: [clientId], references: [id], onDelete: Cascade)
   adminId     String
-  admin       User          @relation("ProjectAdmin", fields: [adminId], references: [id])
+  admin       User          @relation("ProjectAdmin", fields: [adminId], references: [id], onDelete: Cascade)
   companyId   String?       // Lier le projet à une entreprise
   company     Company?      @relation(fields: [companyId], references: [id])
   steps       ProjectStep[]
@@ -142,7 +141,7 @@ model Ticket {
 
   // Relations
   userId      String
-  user        User          @relation(fields: [userId], references: [id])
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   projectId   String?
   project     Project?      @relation(fields: [projectId], references: [id])
   responses   TicketResponse[]
@@ -160,7 +159,7 @@ model TicketResponse {
   ticketId  String
   ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("ticket_responses")
 }
@@ -175,7 +174,7 @@ model Comment {
   projectId String
   project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("comments")
 }

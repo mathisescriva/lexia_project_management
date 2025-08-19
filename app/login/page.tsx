@@ -68,7 +68,7 @@ export default function LoginPage() {
           {/* Header avec logo et titre */}
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <Logo size="lg" />
+              <Logo size="xl" />
             </div>
             
             <div className="space-y-3">
