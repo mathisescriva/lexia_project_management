@@ -142,13 +142,16 @@ export default function ProjectsPage() {
           name: '',
           description: '',
           clientId: '',
+          startDate: '',
+          endDate: '',
           steps: [
             { title: 'Analyse des besoins', description: 'Réunion avec le client pour définir les fonctionnalités', startDate: '', endDate: '' },
             { title: 'Design et maquettes', description: 'Création des maquettes et de l\'expérience utilisateur', startDate: '', endDate: '' },
             { title: 'Développement', description: 'Implémentation des fonctionnalités', startDate: '', endDate: '' },
             { title: 'Tests et validation', description: 'Tests complets et validation client', startDate: '', endDate: '' },
             { title: 'Déploiement', description: 'Mise en production et formation', startDate: '', endDate: '' }
-          ]
+          ],
+          actions: []
         })
         setShowForm(false)
         fetchProjects()
