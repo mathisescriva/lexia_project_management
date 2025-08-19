@@ -16,7 +16,7 @@
     "db:clear-projects": "npx tsx scripts/clear-projects.ts",
     "deploy": "./scripts/deploy.sh",
     "postinstall": "echo 'Skipping Prisma generate in postinstall'",
-    "vercel-build": "echo 'Build completed'"
+
 
   },
   "dependencies": {
