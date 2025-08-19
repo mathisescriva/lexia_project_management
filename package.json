@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "npx prisma migrate dev",
@@ -14,7 +14,8 @@
     "db:seed": "npx tsx scripts/seed.ts",
     "db:seed:prod": "npx tsx scripts/seed-production.ts",
     "db:clear-projects": "npx tsx scripts/clear-projects.ts",
-    "deploy": "./scripts/deploy.sh"
+    "deploy": "./scripts/deploy.sh",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "next": "14.0.4",
