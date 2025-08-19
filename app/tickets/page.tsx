@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useAuth } from '@/hooks/useAuth.tsx'
+import { useAuth } from '@/hooks/useAuth'
 import Layout from '@/components/Layout'
 import { PlusIcon, ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { useAuth } from '@/hooks/useAuth.tsx'
+import { useAuth } from '@/hooks/useAuth'
 import Layout from '@/components/Layout'
 import Comments from '@/components/Comments'
 import ContactForm from '@/components/ContactForm'
