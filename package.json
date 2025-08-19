@@ -15,7 +15,8 @@
     "db:seed:prod": "npx tsx scripts/seed-production.ts",
     "db:clear-projects": "npx tsx scripts/clear-projects.ts",
     "deploy": "./scripts/deploy.sh",
-    "postinstall": "npx prisma generate"
+    "postinstall": "npx prisma generate",
+    "vercel-build": "npx prisma generate && npx prisma migrate deploy && next build"
   },
   "dependencies": {
     "next": "14.0.4",
