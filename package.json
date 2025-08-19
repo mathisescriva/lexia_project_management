@@ -1,0 +1,49 @@
+{
+  "name": "lexia-project-management",
+  "version": "1.0.0",
+  "description": "Application Lexia de gestion de projet - MVPIA",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:migrate": "npx prisma migrate dev",
+    "db:generate": "npx prisma generate",
+    "db:studio": "npx prisma studio",
+    "db:seed": "npx tsx scripts/seed.ts",
+    "db:seed:prod": "npx tsx scripts/seed-production.ts",
+    "db:clear-projects": "npx tsx scripts/clear-projects.ts",
+    "deploy": "./scripts/deploy.sh"
+  },
+  "dependencies": {
+    "next": "14.0.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "@prisma/client": "^5.7.1",
+    "prisma": "^5.7.1",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "googleapis": "^128.0.0",
+    "next-auth": "^4.24.5",
+    "tailwindcss": "^3.3.6",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "@headlessui/react": "^1.7.17",
+    "@heroicons/react": "^2.0.18",
+    "react-hook-form": "^7.48.2",
+    "react-hot-toast": "^2.4.1",
+    "date-fns": "^2.30.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/jsonwebtoken": "^9.0.5",
+    "eslint": "^8.56.0",
+    "eslint-config-next": "14.0.4",
+    "typescript": "^5.3.3"
+  }
+}
