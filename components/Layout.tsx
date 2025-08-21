@@ -50,9 +50,9 @@ export default function Layout({ children }: LayoutProps) {
       <div className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? 'block' : 'hidden'}`}>
         <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 flex w-64 flex-col bg-white shadow-sm">
-          <div className="flex h-16 items-center justify-between px-4 bg-sage-50">
+          <div className="flex h-20 items-center justify-between px-4">
             <div className="flex items-center">
-              <Logo size="md" />
+              <Logo size="lg" />
             </div>
             <button
               onClick={() => setSidebarOpen(false)}
@@ -82,7 +82,7 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             ))}
           </nav>
-          <div className="border-t border-sage-200 p-4 bg-sage-50">
+          <div className="border-t border-sage-200 p-4">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0">
                 <Avatar user={user || undefined} size="md" />
@@ -105,9 +105,9 @@ export default function Layout({ children }: LayoutProps) {
       {/* Desktop sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col">
         <div className="flex flex-col flex-grow bg-white border-r border-sage-200 shadow-sm">
-          <div className="flex h-16 items-center px-4 bg-sage-50">
+          <div className="flex h-20 items-center px-4">
             <div className="flex items-center">
-              <Logo size="md" />
+              <Logo size="lg" />
             </div>
           </div>
           <nav className="flex-1 space-y-1 px-3 py-4">
@@ -130,7 +130,7 @@ export default function Layout({ children }: LayoutProps) {
               </Link>
             ))}
           </nav>
-          <div className="border-t border-sage-200 p-4 bg-sage-50">
+          <div className="border-t border-sage-200 p-4">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0">
                 <Avatar user={user || undefined} size="md" />
