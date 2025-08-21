@@ -14,8 +14,14 @@
     "db:seed": "npx tsx scripts/seed.ts",
     "db:seed:prod": "npx tsx scripts/seed-production.ts",
     "db:clear-projects": "npx tsx scripts/clear-projects.ts",
-    "deploy": "./scripts/deploy.sh",
-    "postinstall": "echo 'Skipping Prisma generate in postinstall'"
+    "db:reset": "npx prisma migrate reset --force",
+    "db:deploy": "npx prisma migrate deploy",
+    "build:prod": "npm run db:generate && npm run build",
+    "start:prod": "npm run db:deploy && npm start",
+    "deploy:render": "./scripts/render-deploy.sh",
+    "check:env": "./scripts/check-production-env.sh",
+    "setup:prod": "./scripts/setup-production.sh",
+    "postinstall": "npx prisma generate"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",

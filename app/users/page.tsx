@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
+import Avatar from '@/components/Avatar'
 import { 
   PlusIcon, 
   UserIcon,
@@ -17,6 +18,7 @@ interface User {
   email: string
   name: string
   role: string
+  avatar?: string
   companyId?: string
   company?: {
     id: string
@@ -45,7 +47,8 @@ export default function UsersPage() {
     email: '',
     password: '',
     role: 'CLIENT',
-    companyId: ''
+    companyId: '',
+    avatar: ''
   })
 
   useEffect(() => {
@@ -120,7 +123,8 @@ export default function UsersPage() {
       email: user.email,
       password: '',
       role: user.role,
-      companyId: user.companyId || ''
+      companyId: user.companyId || '',
+      avatar: user.avatar || ''
     })
     setShowForm(true)
   }
@@ -221,6 +225,52 @@ export default function UsersPage() {
                 </div>
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Avatar
+                </label>
+                <div className="grid grid-cols-3 gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, avatar: '/avatars/avatar_homme.svg' })}
+                    className={`p-4 border-2 rounded-lg transition-all ${
+                      formData.avatar === '/avatars/avatar_homme.svg'
+                        ? 'border-lexia-500 bg-lexia-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Avatar user={{ name: 'Homme', avatar: '/avatars/avatar_homme.svg' }} size="lg" />
+                    <p className="text-xs text-center mt-2">Homme</p>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, avatar: '/avatars/avatar_femme.svg' })}
+                    className={`p-4 border-2 rounded-lg transition-all ${
+                      formData.avatar === '/avatars/avatar_femme.svg'
+                        ? 'border-lexia-500 bg-lexia-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Avatar user={{ name: 'Femme', avatar: '/avatars/avatar_femme.svg' }} size="lg" />
+                    <p className="text-xs text-center mt-2">Femme</p>
+                  </button>
+                  
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, avatar: '/avatars/avatar_admin.svg' })}
+                    className={`p-4 border-2 rounded-lg transition-all ${
+                      formData.avatar === '/avatars/avatar_admin.svg'
+                        ? 'border-lexia-500 bg-lexia-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <Avatar user={{ name: 'Admin', avatar: '/avatars/avatar_admin.svg', role: 'ADMIN' }} size="lg" />
+                    <p className="text-xs text-center mt-2">Admin</p>
+                  </button>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -276,7 +326,7 @@ export default function UsersPage() {
                   onClick={() => {
                     setShowForm(false)
                     setEditingUser(null)
-                    setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '' })
+                    setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '', avatar: '' })
                   }}
                   className="btn-secondary"
                 >
@@ -323,11 +373,7 @@ export default function UsersPage() {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-lexia-600 flex items-center justify-center">
-                            <span className="text-white text-sm font-medium">
-                              {userItem.name.charAt(0).toUpperCase()}
-                            </span>
-                          </div>
+                          <Avatar user={userItem} size="md" />
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">

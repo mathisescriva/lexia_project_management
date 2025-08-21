@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/useAuth'
 import Layout from '@/components/Layout'
+import Avatar from '@/components/Avatar'
 import Comments from '@/components/Comments'
 import ContactForm from '@/components/ContactForm'
 import { 
@@ -18,7 +19,8 @@ import {
   PlusIcon,
   EyeIcon,
   PencilIcon,
-  PhoneIcon
+  PhoneIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 import Chatbot from '@/components/Chatbot'
@@ -27,6 +29,8 @@ interface ProjectStep {
   id: string
   title: string
   description: string
+  startDate?: string
+  endDate?: string
   order: number
   completed: boolean
   completedAt?: string
@@ -75,6 +79,8 @@ export default function ProjectDetailPage() {
   const [loading, setLoading] = useState(true)
   const [activeTab, setActiveTab] = useState<'overview' | 'timeline' | 'files' | 'actions' | 'comments'>('overview')
   const [showContactForm, setShowContactForm] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   useEffect(() => {
     if (params.id) {
@@ -118,6 +124,30 @@ export default function ProjectDetailPage() {
       }
     } catch (error) {
       toast.error('Erreur lors de la mise à jour')
+    }
+  }
+
+  const handleDeleteProject = async () => {
+    if (!project) return
+    
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/projects/${project.id}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        toast.success('Projet supprimé avec succès')
+        router.push('/projects')
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Erreur lors de la suppression')
+      }
+    } catch (error) {
+      toast.error('Erreur lors de la suppression du projet')
+    } finally {
+      setIsDeleting(false)
+      setShowDeleteConfirm(false)
     }
   }
 
@@ -215,13 +245,22 @@ export default function ProjectDetailPage() {
               {getStatusText(project.status)}
             </span>
             {user?.role === 'ADMIN' && (
-              <button
-                onClick={() => router.push(`/projects/${params.id}/edit`)}
-                className="btn-primary flex items-center"
-              >
-                <PencilIcon className="h-4 w-4 mr-2" />
-                Modifier
-              </button>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => router.push(`/projects/${params.id}/edit`)}
+                  className="btn-primary flex items-center"
+                >
+                  <PencilIcon className="h-4 w-4 mr-2" />
+                  Modifier
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="btn-secondary text-red-600 border-red-200 hover:bg-red-50 hover:border-red-300 flex items-center"
+                >
+                  <TrashIcon className="h-4 w-4 mr-2" />
+                  Supprimer
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -276,7 +315,10 @@ export default function ProjectDetailPage() {
                 <dl className="space-y-3">
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Client</dt>
-                    <dd className="text-sm text-gray-900">{project.client?.name}</dd>
+                    <dd className="text-sm text-gray-900 flex items-center">
+                      <Avatar user={project.client} size="sm" className="mr-2" />
+                      {project.client?.name}
+                    </dd>
                   </div>
                   <div>
                     <dt className="text-sm font-medium text-gray-500">Date de début</dt>
@@ -337,45 +379,109 @@ export default function ProjectDetailPage() {
           {activeTab === 'timeline' && (
             <div className="card">
               <h3 className="text-lg font-medium text-gray-900 mb-6">Timeline du projet</h3>
-              <div className="space-y-4">
-                {project.steps.map((step, index) => (
-                  <div key={step.id} className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        step.completed ? 'bg-green-500' : 'bg-gray-200'
-                      }`}>
-                        {step.completed ? (
-                          <CheckCircleIcon className="h-5 w-5 text-white" />
-                        ) : (
-                          <span className="text-sm font-medium text-gray-600">{index + 1}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <h4 className={`text-sm font-medium ${
-                          step.completed ? 'text-green-600' : 'text-gray-900'
+              <div className="relative">
+                {/* Ligne de connexion verticale */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                
+                <div className="space-y-6">
+                  {project.steps.map((step, index) => (
+                    <div key={step.id} className="relative flex items-start">
+                      {/* Indicateur de progression */}
+                      <div className="flex-shrink-0 mr-4 relative">
+                        <div className={`relative w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                          step.completed 
+                            ? 'bg-green-500 border-green-500 shadow-lg' 
+                            : 'bg-white border-gray-300 shadow-md'
                         }`}>
-                          {step.title}
-                        </h4>
-                        {user?.role === 'ADMIN' && (
-                          <button
-                            onClick={() => updateStepStatus(step.id, !step.completed)}
-                            className="p-1 text-gray-400 hover:text-gray-600"
-                          >
-                            <PencilIcon className="h-4 w-4" />
-                          </button>
+                          {step.completed ? (
+                            <CheckCircleIcon className="h-5 w-5 text-white" />
+                          ) : (
+                            <span className="text-sm font-medium text-gray-600">{index + 1}</span>
+                          )}
+                        </div>
+                        {/* Ligne de connexion qui s'étend jusqu'à la prochaine étape */}
+                        {index < project.steps.length - 1 && (
+                          <div className={`absolute left-4 top-8 w-0.5 ${
+                            step.completed ? 'bg-green-500' : 'bg-gray-200'
+                          }`} style={{ height: '200px' }}></div>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{step.description}</p>
-                      {step.completed && step.completedAt && (
-                        <p className="text-xs text-gray-500 mt-1">
-                          Terminé le {new Date(step.completedAt).toLocaleDateString('fr-FR')}
-                        </p>
-                      )}
+                      
+                      {/* Contenu de l'étape */}
+                      <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className={`text-base font-semibold ${
+                            step.completed ? 'text-green-700' : 'text-gray-900'
+                          }`}>
+                            {step.title}
+                          </h4>
+                          {user?.role === 'ADMIN' && (
+                            <button
+                              onClick={() => updateStepStatus(step.id, !step.completed)}
+                              className={`p-2 rounded-full transition-colors ${
+                                step.completed 
+                                  ? 'text-green-600 hover:bg-green-50' 
+                                  : 'text-gray-400 hover:bg-gray-50'
+                              }`}
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                          )}
+                        </div>
+                        
+                        <p className="text-sm text-gray-600 mb-3">{step.description}</p>
+                        
+                        {/* Dates avec icônes */}
+                        {(step.startDate || step.endDate) && (
+                          <div className="flex items-center space-x-6 mb-2">
+                            {step.startDate && (
+                              <div className="flex items-center space-x-1">
+                                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                <span className="text-xs font-medium text-blue-600">
+                                  Début: {new Date(step.startDate).toLocaleDateString('fr-FR')}
+                                </span>
+                              </div>
+                            )}
+                            {step.endDate && (
+                              <div className="flex items-center space-x-1">
+                                <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+                                <span className="text-xs font-medium text-red-600">
+                                  Fin: {new Date(step.endDate).toLocaleDateString('fr-FR')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                        
+                        {/* Statut de completion */}
+                        {step.completed && step.completedAt && (
+                          <div className="flex items-center space-x-2 mt-2 p-2 bg-green-50 rounded-md">
+                            <CheckCircleIcon className="h-4 w-4 text-green-600" />
+                            <span className="text-xs font-medium text-green-700">
+                              Terminé le {new Date(step.completedAt).toLocaleDateString('fr-FR')}
+                            </span>
+                          </div>
+                        )}
+                        
+                        {/* Barre de progression pour l'étape */}
+                        <div className="mt-3">
+                          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                            <span>Progression</span>
+                            <span>{step.completed ? '100%' : '0%'}</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div 
+                              className={`h-2 rounded-full transition-all duration-300 ${
+                                step.completed ? 'bg-green-500' : 'bg-gray-300'
+                              }`}
+                              style={{ width: step.completed ? '100%' : '0%' }}
+                            ></div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           )}
@@ -593,6 +699,54 @@ export default function ProjectDetailPage() {
           isOpen={showContactForm}
           onClose={() => setShowContactForm(false)}
         />
+
+        {/* Delete Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3 text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                  <TrashIcon className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mt-4">
+                  Supprimer le projet
+                </h3>
+                <div className="mt-2 px-7 py-3">
+                  <p className="text-sm text-gray-500">
+                    Êtes-vous sûr de vouloir supprimer le projet "{project.name}" ? 
+                    Cette action est irréversible et supprimera toutes les données associées 
+                    (étapes, actions, commentaires, fichiers).
+                  </p>
+                </div>
+                <div className="items-center px-4 py-3">
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setShowDeleteConfirm(false)}
+                      className="flex-1 btn-secondary"
+                      disabled={isDeleting}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={handleDeleteProject}
+                      className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Suppression...
+                        </>
+                      ) : (
+                        'Supprimer définitivement'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   )

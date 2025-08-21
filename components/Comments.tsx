@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useAuth } from '@/hooks/useAuth'
 import toast from 'react-hot-toast'
 import { PaperAirplaneIcon, UserIcon, ChatBubbleLeftIcon } from '@heroicons/react/24/outline'
+import Avatar from './Avatar'
 
 interface Comment {
   id: string
@@ -13,6 +14,7 @@ interface Comment {
     id: string
     name: string
     role: string
+    avatar?: string
   }
 }
 
@@ -101,11 +103,7 @@ export default function Comments({ projectId }: CommentsProps) {
       <form onSubmit={handleSubmit} className="space-y-3">
         <div className="flex space-x-3">
           <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-sage-200 rounded-full flex items-center justify-center">
-              <span className="text-sage-700 text-sm font-medium">
-                {user?.name?.charAt(0).toUpperCase()}
-              </span>
-            </div>
+            <Avatar user={user || undefined} size="sm" />
           </div>
           <div className="flex-1">
             <textarea
@@ -149,11 +147,7 @@ export default function Comments({ projectId }: CommentsProps) {
           {comments.map((comment) => (
             <div key={comment.id} className="flex space-x-3">
               <div className="flex-shrink-0">
-                <div className="h-8 w-8 bg-sage-200 rounded-full flex items-center justify-center">
-                  <span className="text-sage-700 text-sm font-medium">
-                    {comment.user.name.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                <Avatar user={comment.user} size="sm" />
               </div>
               <div className="flex-1">
                 <div className="bg-sage-50 rounded-lg p-3">

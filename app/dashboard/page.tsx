@@ -14,8 +14,7 @@ import {
   CalendarIcon,
   DocumentTextIcon,
   UserIcon,
-  SparklesIcon,
-  FireIcon
+  SparklesIcon
 } from '@heroicons/react/24/outline'
 
 interface ProjectAction {
@@ -138,20 +137,6 @@ export default function DashboardPage() {
 
   const clientActions = getClientActions()
 
-  // Actions urgentes (échéance dans les 3 jours)
-  const getUrgentActions = () => {
-    const now = new Date()
-    const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000)
-    
-    return clientActions.filter(({ action }) => {
-      if (!action.dueDate) return false
-      const dueDate = new Date(action.dueDate)
-      return dueDate <= threeDaysFromNow
-    })
-  }
-
-  const urgentActions = getUrgentActions()
-
   // Compter les tickets ouverts
   const openTicketsCount = tickets.filter(ticket => 
     ticket.status === 'OPEN' || ticket.status === 'IN_PROGRESS'
@@ -199,67 +184,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Actions prioritaires pour les clients - Section principale */}
+        {/* Actions à effectuer pour les clients */}
         {user?.role === 'CLIENT' && (
           <div className="space-y-8">
-            {/* Actions urgentes */}
-            {urgentActions.length > 0 && (
-              <div className="card-elegant">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-red-100 rounded-lg">
-                      <FireIcon className="h-5 w-5 text-red-600" />
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-semibold text-sage-800">
-                        Actions prioritaires
-                      </h2>
-                      <p className="text-sm text-sage-600">
-                        {urgentActions.length} tâche(s) à traiter en priorité
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-red-600">{urgentActions.length}</div>
-                    <div className="text-xs text-sage-500">En attente</div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {urgentActions.slice(0, 4).map(({ project, action }) => (
-                    <div 
-                      key={action.id}
-                      className="action-card-urgent"
-                      onClick={() => router.push(`/projects/${project.id}`)}
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-3">
-                            <span className="text-sm font-bold text-red-700 bg-red-200 px-3 py-1 rounded-full">
-                              {project.name}
-                            </span>
-                            <span className="text-sm font-bold text-red-700 bg-red-200 px-3 py-1 rounded-full flex items-center">
-                              <CalendarIcon className="h-3 w-3 mr-1" />
-                              {new Date(action.dueDate!).toLocaleDateString('fr-FR')}
-                            </span>
-                          </div>
-                          <h3 className="text-lg font-bold text-sage-800 mb-2">
-                            {action.title}
-                          </h3>
-                          {action.description && (
-                            <p className="text-sage-700">
-                              {action.description}
-                            </p>
-                          )}
-                        </div>
-                        <ArrowRightIcon className="h-6 w-6 text-red-600 ml-4" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
             {/* Toutes les actions côté client */}
             {clientActions.length > 0 && (
               <div className="card-elegant">
@@ -287,49 +214,38 @@ export default function DashboardPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {clientActions.slice(0, 6).map(({ project, action }) => {
-                    const isUrgent = urgentActions.some(ua => ua.action.id === action.id)
-                    const cardClass = isUrgent ? 'action-card-urgent' : 'action-card'
-                    
-                    return (
-                      <div 
-                        key={action.id}
-                        className={`bg-white border border-sage-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 cursor-pointer ${
-                          isUrgent ? 'border-l-4 border-l-red-500' : ''
-                        }`}
-                        onClick={() => router.push(`/projects/${project.id}`)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-2">
-                              <span className="text-xs font-medium text-sage-600 bg-sage-100 px-2 py-1 rounded">
-                                {project.name}
+                  {clientActions.slice(0, 6).map(({ project, action }) => (
+                    <div 
+                      key={action.id}
+                      className="bg-white border border-sage-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 cursor-pointer"
+                      onClick={() => router.push(`/projects/${project.id}`)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2 mb-2">
+                            <span className="text-xs font-medium text-sage-600 bg-sage-100 px-2 py-1 rounded">
+                              {project.name}
+                            </span>
+                            {action.dueDate && (
+                              <span className="text-xs font-medium px-2 py-1 rounded flex items-center text-orange-700 bg-orange-100">
+                                <CalendarIcon className="h-3 w-3 mr-1" />
+                                {new Date(action.dueDate).toLocaleDateString('fr-FR')}
                               </span>
-                              {action.dueDate && (
-                                <span className={`text-xs font-medium px-2 py-1 rounded flex items-center ${
-                                  isUrgent 
-                                    ? 'text-red-700 bg-red-100' 
-                                    : 'text-orange-700 bg-orange-100'
-                                }`}>
-                                  <CalendarIcon className="h-3 w-3 mr-1" />
-                                  {new Date(action.dueDate).toLocaleDateString('fr-FR')}
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="text-sm font-semibold text-sage-800 mb-1">
-                              {action.title}
-                            </h3>
-                            {action.description && (
-                              <p className="text-xs text-sage-600 line-clamp-2">
-                                {action.description}
-                              </p>
                             )}
                           </div>
-                          <ArrowRightIcon className="h-4 w-4 text-sage-400 ml-3 flex-shrink-0" />
+                          <h3 className="text-sm font-semibold text-sage-800 mb-1">
+                            {action.title}
+                          </h3>
+                          {action.description && (
+                            <p className="text-xs text-sage-600 line-clamp-2">
+                              {action.description}
+                            </p>
+                          )}
                         </div>
+                        <ArrowRightIcon className="h-4 w-4 text-sage-400 ml-3 flex-shrink-0" />
                       </div>
-                    )
-                  })}
+                    </div>
+                  ))}
                 </div>
                 
                 {clientActions.length > 6 && (

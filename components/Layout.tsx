@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/useAuth'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Logo from './Logo'
+import Avatar from './Avatar'
 import { 
   HomeIcon, 
   FolderIcon, 
@@ -84,11 +85,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="border-t border-sage-200 p-4 bg-sage-50">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0">
-                <div className="h-10 w-10 bg-sage-200 rounded-full flex items-center justify-center">
-                  <span className="text-sage-700 text-sm font-medium">
-                    {user?.name?.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                <Avatar user={user || undefined} size="md" />
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-sage-800">{user?.name}</p>
@@ -136,11 +133,7 @@ export default function Layout({ children }: LayoutProps) {
           <div className="border-t border-sage-200 p-4 bg-sage-50">
             <div className="flex items-center mb-3">
               <div className="flex-shrink-0">
-                <div className="h-10 w-10 bg-sage-200 rounded-full flex items-center justify-center">
-                  <span className="text-sage-700 text-sm font-medium">
-                    {user?.name?.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+                <Avatar user={user || undefined} size="md" />
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-sage-800">{user?.name}</p>

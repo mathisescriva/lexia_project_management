@@ -1,20 +1,56 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Optimisations pour la production
+  output: 'standalone',
+  
+  // Configuration des images
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'drive.google.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-      },
-    ],
+    domains: ['localhost'],
+    unoptimized: false,
   },
-  // Supprimer la validation des variables d'environnement pendant le build
+  
+  // Configuration des headers de sécurité
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ]
+  },
+  
+  // Configuration des redirections
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: false,
+      },
+    ]
+  },
+  
+  // Optimisations de build
   experimental: {
-    serverComponentsExternalPackages: ['@prisma/client'],
+    optimizeCss: true,
+  },
+  
+  // Configuration pour Render
+  env: {
+    CUSTOM_KEY: process.env.CUSTOM_KEY,
   },
 }
 

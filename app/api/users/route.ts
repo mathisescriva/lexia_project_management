@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
         email: true,
         name: true,
         role: true,
+        avatar: true,
         companyId: true,
         company: {
           select: {
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
 
-    const { name, email, password, role, companyId } = await request.json()
+    const { name, email, password, role, companyId, avatar } = await request.json()
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -107,6 +108,7 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role: role || 'CLIENT',
+        avatar: avatar || null,
         companyId: companyId || null
       },
       select: {
@@ -114,6 +116,7 @@ export async function POST(request: NextRequest) {
         email: true,
         name: true,
         role: true,
+        avatar: true,
         companyId: true,
         company: {
           select: {

@@ -253,3 +253,50 @@ export async function PUT(
     )
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const token = request.cookies.get('auth-token')?.value
+    if (!token) {
+      return NextResponse.json({ error: 'Non autorisé' }, { status: 401 })
+    }
+
+    const payload = verifyToken(token)
+    if (!payload) {
+      return NextResponse.json({ error: 'Token invalide' }, { status: 401 })
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId }
+    })
+
+    if (!user || user.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
+    }
+
+    // Vérifier que le projet existe
+    const project = await prisma.project.findUnique({
+      where: { id: params.id }
+    })
+
+    if (!project) {
+      return NextResponse.json({ error: 'Projet non trouvé' }, { status: 404 })
+    }
+
+    // Supprimer le projet (les relations seront supprimées en cascade)
+    await prisma.project.delete({
+      where: { id: params.id }
+    })
+
+    return NextResponse.json({ message: 'Projet supprimé avec succès' })
+  } catch (error) {
+    console.error('Delete project error:', error)
+    return NextResponse.json(
+      { error: 'Erreur interne du serveur' },
+      { status: 500 }
+    )
+  }
+}

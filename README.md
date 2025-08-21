@@ -1,208 +1,221 @@
-# Lexia - Application de Gestion de Projet (MVPIA)
+# Lexia Onboarding - Application de Gestion de Projets
 
-Application web moderne pour la gestion de projets clients chez Lexia, offrant un dashboard centralisé pour le suivi des projets, le partage de fichiers et le support client.
+Application web de gestion de projets pour Lexia, permettant aux administrateurs de gérer les projets clients et aux clients de suivre l'avancement de leurs projets.
 
 ## 🚀 Fonctionnalités
 
-### Pour les Clients
-- **Dashboard personnalisé** avec vue d'ensemble des projets
-- **Suivi de l'avancement** avec barres de progression et étapes
-- **Accès aux fichiers** via intégration Google Drive
-- **Support client** via chatbot/tickets
-- **Interface responsive** et moderne
-
-### Pour les Admins (Lexia)
-- **Gestion complète des projets** (création, modification, suivi)
-- **Interface d'administration** pour tous les clients
-- **Gestion des tickets** et réponses aux demandes
-- **Upload et partage de fichiers** via Google Drive
-- **Vue d'ensemble** de tous les projets
+- **Gestion des entreprises** : Création et gestion des entreprises clientes
+- **Gestion des utilisateurs** : Création d'utilisateurs avec rôles (ADMIN/CLIENT)
+- **Gestion des projets** : Création, modification et suppression de projets
+- **Timeline des projets** : Étapes avec dates de début/fin et progression
+- **Actions à effectuer** : Actions côté client et côté Lexia
+- **Fichiers partagés** : Intégration Google Drive
+- **Commentaires** : Système de commentaires par projet
+- **Chatbot** : Assistant intégré dans chaque projet
+- **Avatars** : Gestion des avatars utilisateurs
 
 ## 🛠️ Technologies
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS, Headless UI
-- **Backend**: Next.js API Routes
-- **Base de données**: SQLite (Prisma ORM)
-- **Authentification**: JWT + bcrypt
-- **Stockage fichiers**: Google Drive API
-- **UI Components**: Heroicons, React Hook Form
+- **Frontend** : Next.js 14, React, TypeScript, Tailwind CSS
+- **Backend** : Next.js API Routes
+- **Base de données** : PostgreSQL (production) / SQLite (développement)
+- **ORM** : Prisma
+- **Authentification** : JWT
+- **Déploiement** : Render
 
-## 📦 Installation
+## 📋 Prérequis
 
-### Prérequis
 - Node.js 18+ 
 - npm ou yarn
+- PostgreSQL (pour la production)
 
-### 1. Cloner le projet
-```bash
-git clone <repository-url>
-cd lexia-project-management
-```
+## 🔧 Installation locale
 
-### 2. Installer les dépendances
-```bash
-npm install
-```
+1. **Cloner le repository**
+   ```bash
+   git clone <repository-url>
+   cd ondboarding
+   ```
 
-### 3. Configuration de l'environnement
-```bash
-cp env.example .env.local
-```
+2. **Installer les dépendances**
+   ```bash
+   npm install
+   ```
 
-Éditer `.env.local` avec vos configurations :
-```env
-DATABASE_URL="file:./dev.db"
-JWT_SECRET="your-super-secret-jwt-key"
-```
+3. **Configurer les variables d'environnement**
+   Créer un fichier `.env.local` :
+   ```env
+   DATABASE_URL="file:./dev.db"
+   JWT_SECRET="your-super-secret-jwt-key-here"
+   NEXTAUTH_URL="http://localhost:3000"
+   NEXTAUTH_SECRET="your-nextauth-secret-here"
+   ```
 
-### 4. Initialiser la base de données
-```bash
-npx prisma generate
-npx prisma db push
-```
+4. **Initialiser la base de données**
+   ```bash
+   npx prisma migrate dev
+   npx prisma generate
+   npm run db:seed
+   ```
 
-### 5. Créer un utilisateur admin (optionnel)
-```bash
-npx prisma studio
-```
-Ou utiliser l'API pour créer un utilisateur.
+5. **Lancer l'application**
+   ```bash
+   npm run dev
+   ```
 
-### 6. Lancer l'application
-```bash
-npm run dev
-```
+6. **Accéder à l'application**
+   Ouvrir http://localhost:3000
 
-L'application sera accessible sur `http://localhost:3000`
+## 🚀 Déploiement sur Render
 
-## 🔧 Configuration Google Drive (Optionnel)
+### Méthode 1 : Via render.yaml (Recommandée)
 
-Pour activer le partage de fichiers via Google Drive :
+1. **Connecter le repository** à Render
+2. **Utiliser le fichier render.yaml** fourni
+3. **Render détectera automatiquement** la configuration
 
-1. **Créer un projet Google Cloud**
-2. **Activer l'API Google Drive**
-3. **Créer un compte de service** et télécharger la clé JSON
-4. **Configurer les variables d'environnement** :
+### Méthode 2 : Configuration manuelle
 
-```env
-GOOGLE_SERVICE_ACCOUNT_KEY_FILE="path/to/service-account-key.json"
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
-GOOGLE_REDIRECT_URI="http://localhost:3000/api/auth/google/callback"
-```
+1. **Créer un nouveau Web Service** sur Render
+2. **Connecter le repository** GitHub
+3. **Configurer les variables d'environnement** :
+   - `NODE_ENV`: production
+   - `DATABASE_URL`: URL de la base PostgreSQL
+   - `JWT_SECRET`: Clé secrète générée
+   - `NEXTAUTH_URL`: URL de votre application
+   - `NEXTAUTH_SECRET`: Clé secrète NextAuth
 
-## 📁 Structure du Projet
+4. **Configurer les commandes de build** :
+   - Build Command: `npm install && npx prisma generate && npm run build`
+   - Start Command: `npm start`
 
-```
-├── app/                    # App Router Next.js
-│   ├── api/               # API Routes
-│   ├── dashboard/         # Page dashboard
-│   ├── login/            # Page connexion
-│   └── globals.css       # Styles globaux
-├── components/           # Composants React
-├── hooks/               # Hooks personnalisés
-├── lib/                 # Utilitaires et services
-├── prisma/              # Schéma et migrations DB
-└── public/              # Assets statiques
-```
+## 📊 Base de données
+
+### Migration vers PostgreSQL (Production)
+
+Pour passer de SQLite à PostgreSQL en production :
+
+1. **Modifier le schema Prisma** si nécessaire
+2. **Créer une migration** :
+   ```bash
+   npx prisma migrate dev --name production-setup
+   ```
+3. **Appliquer les migrations** en production :
+   ```bash
+   npx prisma migrate deploy
+   ```
+
+### Données de test
+
+L'application inclut des données de test :
+- **Admin** : admin@lexia.com / admin123
+- **Clients** : Créés automatiquement via le script de seed
 
 ## 🔐 Authentification
 
-L'application utilise un système d'authentification JWT simple :
-
-- **Login/Logout** via API routes
-- **Cookies HTTP-only** pour la sécurité
+- **JWT** pour l'authentification
 - **Rôles** : ADMIN et CLIENT
-- **Protection des routes** automatique
+- **Sessions** persistantes via cookies
 
-## 📊 Base de Données
+## 📁 Structure du projet
 
-### Tables principales :
-- **Users** : Utilisateurs (admin/client)
-- **Projects** : Projets avec progression
-- **ProjectSteps** : Étapes des projets
-- **Tickets** : Demandes de support
-- **ProjectFiles** : Métadonnées des fichiers
-
-## 🚀 Déploiement
-
-### Vercel (Recommandé)
-1. Connecter le repository GitHub
-2. Configurer les variables d'environnement
-3. Déployer automatiquement
-
-### Autres plateformes
-- **Railway** : Backend + Base de données
-- **Supabase** : Alternative à la base de données
-- **Netlify** : Alternative au frontend
-
-## 📝 API Endpoints
-
-### Authentification
-- `POST /api/auth/login` - Connexion
-- `POST /api/auth/logout` - Déconnexion
-- `GET /api/auth/me` - Vérifier l'auth
-
-### Projets
-- `GET /api/projects` - Lister les projets
-- `POST /api/projects` - Créer un projet
-- `PUT /api/projects/[id]` - Modifier un projet
-
-### Tickets
-- `GET /api/tickets` - Lister les tickets
-- `POST /api/tickets` - Créer un ticket
-- `PUT /api/tickets/[id]` - Modifier un ticket
-
-## 🎨 Personnalisation
-
-### Couleurs
-Les couleurs Lexia sont définies dans `tailwind.config.js` :
-```js
-lexia: {
-  50: '#f0f9ff',
-  // ... autres teintes
-}
+```
+├── app/                    # Next.js App Router
+│   ├── api/               # API Routes
+│   ├── companies/         # Gestion des entreprises
+│   ├── projects/          # Gestion des projets
+│   └── users/             # Gestion des utilisateurs
+├── components/            # Composants React réutilisables
+├── hooks/                 # Hooks personnalisés
+├── lib/                   # Utilitaires et configuration
+├── prisma/                # Schema et migrations
+├── public/                # Assets statiques
+└── scripts/               # Scripts utilitaires
 ```
 
-### Composants
-Tous les composants sont dans `/components` et utilisent Tailwind CSS.
-
-## 🔧 Scripts Disponibles
+## 🧪 Tests
 
 ```bash
-npm run dev          # Développement
-npm run build        # Build production
-npm run start        # Démarrer production
-npm run lint         # Linter
-npm run db:migrate   # Migrations DB
-npm run db:studio    # Interface DB
+# Lancer les tests
+npm test
+
+# Tests avec couverture
+npm run test:coverage
 ```
+
+## 📝 Scripts disponibles
+
+```bash
+npm run dev          # Développement local
+npm run build        # Build de production
+npm run start        # Démarrage production
+npm run db:seed      # Peupler la base de données
+npm run db:reset     # Réinitialiser la base
+npm run db:clear-projects  # Supprimer tous les projets
+```
+
+## 🔧 Configuration avancée
+
+### Google Drive API
+
+Pour activer l'intégration Google Drive :
+
+1. **Créer un projet Google Cloud**
+2. **Activer l'API Google Drive**
+3. **Créer des credentials OAuth2**
+4. **Ajouter les variables d'environnement** :
+   ```env
+   GOOGLE_DRIVE_CLIENT_ID="your-client-id"
+   GOOGLE_DRIVE_CLIENT_SECRET="your-client-secret"
+   GOOGLE_DRIVE_REDIRECT_URI="your-redirect-uri"
+   ```
+
+### Variables d'environnement complètes
+
+```env
+# Base de données
+DATABASE_URL="postgresql://user:password@host:port/database"
+
+# Authentification
+JWT_SECRET="your-jwt-secret"
+NEXTAUTH_URL="https://your-domain.com"
+NEXTAUTH_SECRET="your-nextauth-secret"
+
+# Google Drive (optionnel)
+GOOGLE_DRIVE_CLIENT_ID="your-google-client-id"
+GOOGLE_DRIVE_CLIENT_SECRET="your-google-client-secret"
+GOOGLE_DRIVE_REDIRECT_URI="https://your-domain.com/api/auth/google/callback"
+
+# Environnement
+NODE_ENV="production"
+```
+
+## 🐛 Dépannage
+
+### Problèmes courants
+
+1. **Erreur de base de données** :
+   ```bash
+   npx prisma generate
+   npx prisma migrate reset
+   ```
+
+2. **Erreur de build** :
+   ```bash
+   rm -rf node_modules .next
+   npm install
+   npm run build
+   ```
+
+3. **Problèmes de permissions** :
+   Vérifier que l'utilisateur a les droits ADMIN
 
 ## 📞 Support
 
 Pour toute question ou problème :
-1. Vérifier la documentation
-2. Consulter les logs de l'application
-3. Contacter l'équipe Lexia
+- **Email** : support@lexia.com
+- **Documentation** : [Lien vers la documentation]
 
-## 🔄 Roadmap
+## 📄 Licence
 
-### Phase 1 ✅ (2-3 semaines)
-- [x] Authentification basique
-- [x] Dashboard minimal
-- [x] Gestion des projets
-- [x] Interface admin
-
-### Phase 2 🔄 (2 semaines)
-- [ ] Chatbot MVP
-- [ ] Intégration Google Drive
-- [ ] Gestion des tickets avancée
-
-### Phase 3 📋 (1-2 semaines)
-- [ ] Amélioration UI/UX
-- [ ] FAQ automatisée
-- [ ] Notifications push
-
----
-
-**Développé pour Lexia** - MVPIA 2024
+© 2024 Lexia. Tous droits réservés.

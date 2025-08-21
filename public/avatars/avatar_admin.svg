@@ -1,0 +1,44 @@
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10B981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Fond circulaire -->
+  <circle cx="50" cy="50" r="50" fill="url(#bg)"/>
+  
+  <!-- Tête -->
+  <circle cx="50" cy="40" r="20" fill="#FBBF24"/>
+  
+  <!-- Corps (costume) -->
+  <rect x="35" y="60" width="30" height="35" rx="15" fill="#1F2937"/>
+  
+  <!-- Col de chemise -->
+  <rect x="40" y="60" width="20" height="8" rx="4" fill="#FFFFFF"/>
+  
+  <!-- Cravate -->
+  <path d="M 50 68 L 45 75 L 50 85 L 55 75 Z" fill="#DC2626"/>
+  
+  <!-- Yeux -->
+  <circle cx="45" cy="35" r="3" fill="#1F2937"/>
+  <circle cx="55" cy="35" r="3" fill="#1F2937"/>
+  
+  <!-- Sourcils -->
+  <rect x="42" y="30" width="6" height="2" rx="1" fill="#1F2937"/>
+  <rect x="52" y="30" width="6" height="2" rx="1" fill="#1F2937"/>
+  
+  <!-- Nez -->
+  <ellipse cx="50" cy="40" rx="2" ry="3" fill="#F59E0B"/>
+  
+  <!-- Bouche -->
+  <path d="M 45 45 Q 50 48 55 45" stroke="#1F2937" stroke-width="1.5" fill="none"/>
+  
+  <!-- Cheveux courts -->
+  <path d="M 30 25 Q 50 15 70 25 Q 65 35 50 30 Q 35 35 30 25" fill="#1F2937"/>
+  
+  <!-- Badge admin -->
+  <circle cx="75" cy="25" r="8" fill="#F59E0B"/>
+  <text x="75" y="29" text-anchor="middle" font-family="Arial" font-size="8" font-weight="bold" fill="#1F2937">A</text>
+</svg>

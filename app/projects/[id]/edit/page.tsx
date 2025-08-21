@@ -18,6 +18,8 @@ interface ProjectStep {
   id?: string
   title: string
   description: string
+  startDate?: string
+  endDate?: string
   completed: boolean
   order: number
 }
@@ -493,92 +495,192 @@ export default function EditProjectPage() {
                   onChange={(e) => setNewStep({ ...newStep, description: e.target.value })}
                 />
               </div>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <input
+                  type="date"
+                  placeholder="Date de début"
+                  className="input-field"
+                  value={newStep.startDate}
+                  onChange={(e) => setNewStep({ ...newStep, startDate: e.target.value })}
+                />
+                <input
+                  type="date"
+                  placeholder="Date de fin"
+                  className="input-field"
+                  value={newStep.endDate}
+                  onChange={(e) => setNewStep({ ...newStep, endDate: e.target.value })}
+                />
+              </div>
             </div>
 
             {/* Steps List */}
-            <div className="space-y-3">
-              {steps.map((step, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3 flex-1">
+            <div className="relative">
+              {/* Ligne de connexion verticale */}
+              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+              
+              <div className="space-y-4">
+                {steps.map((step, index) => (
+                  <div key={index} className="relative flex items-start">
+                    {/* Indicateur de progression */}
+                    <div className="flex-shrink-0 mr-4 relative">
                       <button
                         type="button"
                         onClick={() => toggleStepCompletion(index)}
-                        className={`p-1 rounded ${
+                        className={`relative w-12 h-12 rounded-full flex items-center justify-center border-2 transition-all duration-200 ${
                           step.completed 
-                            ? 'text-green-600 bg-green-100' 
-                            : 'text-gray-400 hover:text-gray-600'
+                            ? 'bg-green-500 border-green-500 shadow-lg hover:shadow-xl' 
+                            : 'bg-white border-gray-300 shadow-md hover:shadow-lg hover:border-gray-400'
                         }`}
                       >
-                        <CheckIcon className="h-4 w-4" />
-                      </button>
-                      
-                      <div className="flex-1">
-                        {editingStep === index ? (
-                          <div className="space-y-2">
-                            <input
-                              type="text"
-                              className="input-field"
-                              value={step.title}
-                              onChange={(e) => updateStep(index, 'title', e.target.value)}
-                            />
-                            <input
-                              type="text"
-                              className="input-field"
-                              value={step.description}
-                              onChange={(e) => updateStep(index, 'description', e.target.value)}
-                            />
-                            <div className="flex space-x-2">
-                              <button
-                                type="button"
-                                onClick={() => saveStepEdit(index)}
-                                className="btn-primary text-sm"
-                              >
-                                Sauvegarder
-                              </button>
-                              <button
-                                type="button"
-                                onClick={cancelStepEdit}
-                                className="btn-secondary text-sm"
-                              >
-                                Annuler
-                              </button>
-                            </div>
-                          </div>
+                        {step.completed ? (
+                          <CheckIcon className="h-6 w-6 text-white" />
                         ) : (
-                          <div>
-                            <h3 className={`font-medium ${step.completed ? 'line-through text-gray-500' : 'text-gray-900'}`}>
-                              {step.title}
-                            </h3>
-                            {step.description && (
-                              <p className={`text-sm ${step.completed ? 'text-gray-400' : 'text-gray-600'}`}>
-                                {step.description}
-                              </p>
-                            )}
+                          <span className="text-sm font-bold text-gray-600">{index + 1}</span>
+                        )}
+                      </button>
+                                              {/* Ligne de connexion qui s'étend jusqu'à la prochaine étape */}
+                        {index < steps.length - 1 && (
+                          <div className={`absolute left-6 top-12 w-0.5 ${
+                            step.completed ? 'bg-green-500' : 'bg-gray-200'
+                          }`} style={{ height: '200px' }}></div>
+                        )}
+                    </div>
+                    
+                    {/* Contenu de l'étape */}
+                    <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex-1">
+                          {editingStep === index ? (
+                            <div className="space-y-3">
+                              <input
+                                type="text"
+                                className="input-field font-semibold"
+                                value={step.title}
+                                onChange={(e) => updateStep(index, 'title', e.target.value)}
+                              />
+                              <textarea
+                                className="input-field"
+                                value={step.description}
+                                onChange={(e) => updateStep(index, 'description', e.target.value)}
+                                rows={3}
+                              />
+                              <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1">Date de début</label>
+                                  <input
+                                    type="date"
+                                    className="input-field"
+                                    value={step.startDate || ''}
+                                    onChange={(e) => updateStep(index, 'startDate', e.target.value)}
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs font-medium text-gray-700 mb-1">Date de fin</label>
+                                  <input
+                                    type="date"
+                                    className="input-field"
+                                    value={step.endDate || ''}
+                                    onChange={(e) => updateStep(index, 'endDate', e.target.value)}
+                                  />
+                                </div>
+                              </div>
+                              <div className="flex space-x-2">
+                                <button
+                                  type="button"
+                                  onClick={() => saveStepEdit(index)}
+                                  className="btn-primary text-sm"
+                                >
+                                  Sauvegarder
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={cancelStepEdit}
+                                  className="btn-secondary text-sm"
+                                >
+                                  Annuler
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <h3 className={`text-lg font-semibold mb-2 ${
+                                step.completed ? 'text-green-700 line-through' : 'text-gray-900'
+                              }`}>
+                                {step.title}
+                              </h3>
+                              {step.description && (
+                                <p className={`text-sm mb-3 ${
+                                  step.completed ? 'text-gray-400' : 'text-gray-600'
+                                }`}>
+                                  {step.description}
+                                </p>
+                              )}
+                              
+                              {/* Dates avec icônes */}
+                              {(step.startDate || step.endDate) && (
+                                <div className="flex items-center space-x-6 mb-3">
+                                  {step.startDate && (
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                      <span className="text-sm font-medium text-blue-600">
+                                        Début: {new Date(step.startDate).toLocaleDateString('fr-FR')}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {step.endDate && (
+                                    <div className="flex items-center space-x-2">
+                                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                                      <span className="text-sm font-medium text-red-600">
+                                        Fin: {new Date(step.endDate).toLocaleDateString('fr-FR')}
+                                      </span>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Barre de progression */}
+                              <div className="mb-3">
+                                <div className="flex items-center justify-between text-sm text-gray-600 mb-1">
+                                  <span>Progression</span>
+                                  <span>{step.completed ? '100%' : '0%'}</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-3">
+                                  <div 
+                                    className={`h-3 rounded-full transition-all duration-500 ${
+                                      step.completed ? 'bg-green-500' : 'bg-gray-300'
+                                    }`}
+                                    style={{ width: step.completed ? '100%' : '0%' }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Boutons d'action */}
+                        {editingStep !== index && (
+                          <div className="flex items-center space-x-2 ml-4">
+                            <button
+                              type="button"
+                              onClick={() => startEditingStep(index)}
+                              className="p-2 text-lexia-600 hover:text-lexia-900 hover:bg-lexia-50 rounded-full transition-colors"
+                            >
+                              <PencilIcon className="h-4 w-4" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeStep(index)}
+                              className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                            >
+                              <TrashIcon className="h-4 w-4" />
+                            </button>
                           </div>
                         )}
                       </div>
                     </div>
-
-                    <div className="flex items-center space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => startEditingStep(index)}
-                        className="text-lexia-600 hover:text-lexia-900 p-1"
-                      >
-                        <PencilIcon className="h-4 w-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => removeStep(index)}
-                        className="text-red-600 hover:text-red-900 p-1"
-                      >
-                        <TrashIcon className="h-4 w-4" />
-                      </button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {steps.length === 0 && (

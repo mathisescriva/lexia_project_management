@@ -9,7 +9,8 @@ import {
   FolderIcon,
   CheckCircleIcon,
   ClockIcon,
-  ExclamationTriangleIcon
+  ExclamationTriangleIcon,
+  TrashIcon
 } from '@heroicons/react/24/outline'
 import toast from 'react-hot-toast'
 
@@ -31,6 +32,8 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [companies, setCompanies] = useState<any[]>([])
+  const [deleteProjectId, setDeleteProjectId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -210,6 +213,28 @@ export default function ProjectsPage() {
     }))
   }
 
+  const handleDeleteProject = async (projectId: string) => {
+    setIsDeleting(true)
+    try {
+      const response = await fetch(`/api/projects/${projectId}`, {
+        method: 'DELETE',
+      })
+
+      if (response.ok) {
+        toast.success('Projet supprimé avec succès')
+        fetchProjects()
+      } else {
+        const error = await response.json()
+        toast.error(error.error || 'Erreur lors de la suppression')
+      }
+    } catch (error) {
+      toast.error('Erreur lors de la suppression du projet')
+    } finally {
+      setIsDeleting(false)
+      setDeleteProjectId(null)
+    }
+  }
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'COMPLETED':
@@ -379,55 +404,87 @@ export default function ProjectsPage() {
                     + Ajouter une étape
                   </button>
                 </div>
-                <div className="space-y-3">
-                  {formData.steps.map((step, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-3">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Étape {index + 1}</span>
-                        {formData.steps.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeStep(index)}
-                            className="text-red-600 hover:text-red-700 text-sm"
-                          >
-                            Supprimer
-                          </button>
-                        )}
-                      </div>
-                      <div className="space-y-2">
-                        <input
-                          type="text"
-                          placeholder="Titre de l'étape"
-                          className="input-field"
-                          value={step.title}
-                          onChange={(e) => updateStep(index, 'title', e.target.value)}
-                        />
-                        <textarea
-                          placeholder="Description de l'étape"
-                          rows={2}
-                          className="input-field"
-                          value={step.description}
-                          onChange={(e) => updateStep(index, 'description', e.target.value)}
-                        />
-                        <div className="grid grid-cols-2 gap-2">
-                          <input
-                            type="date"
-                            placeholder="Date de début"
-                            className="input-field"
-                            value={step.startDate}
-                            onChange={(e) => updateStep(index, 'startDate', e.target.value)}
-                          />
-                          <input
-                            type="date"
-                            placeholder="Date de fin"
-                            className="input-field"
-                            value={step.endDate}
-                            onChange={(e) => updateStep(index, 'endDate', e.target.value)}
-                          />
+                <div className="relative">
+                  {/* Ligne de connexion verticale */}
+                  <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+                  
+                  <div className="space-y-4">
+                    {formData.steps.map((step, index) => (
+                      <div key={index} className="relative flex items-start">
+                        {/* Indicateur de progression */}
+                        <div className="flex-shrink-0 mr-4 relative">
+                          <div className="relative w-12 h-12 rounded-full flex items-center justify-center border-2 bg-white border-gray-300 shadow-md">
+                            <span className="text-sm font-bold text-gray-600">{index + 1}</span>
+                          </div>
+                          {/* Ligne de connexion qui s'étend jusqu'à la prochaine étape */}
+                          {index < formData.steps.length - 1 && (
+                            <div className="absolute left-6 top-12 w-0.5 bg-gray-200" style={{ height: '200px' }}></div>
+                          )}
+                        </div>
+                        
+                        {/* Contenu de l'étape */}
+                        <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-lg font-semibold text-gray-900">Étape {index + 1}</h4>
+                            {formData.steps.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeStep(index)}
+                                className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                              >
+                                <TrashIcon className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-3">
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Titre de l'étape</label>
+                              <input
+                                type="text"
+                                placeholder="Titre de l'étape"
+                                className="input-field"
+                                value={step.title}
+                                onChange={(e) => updateStep(index, 'title', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div>
+                              <label className="block text-xs font-medium text-gray-700 mb-1">Description</label>
+                              <textarea
+                                placeholder="Description de l'étape"
+                                rows={3}
+                                className="input-field"
+                                value={step.description}
+                                onChange={(e) => updateStep(index, 'description', e.target.value)}
+                              />
+                            </div>
+                            
+                            <div className="grid grid-cols-2 gap-3">
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Date de début</label>
+                                <input
+                                  type="date"
+                                  className="input-field"
+                                  value={step.startDate}
+                                  onChange={(e) => updateStep(index, 'startDate', e.target.value)}
+                                />
+                              </div>
+                              <div>
+                                <label className="block text-xs font-medium text-gray-700 mb-1">Date de fin</label>
+                                <input
+                                  type="date"
+                                  className="input-field"
+                                  value={step.endDate}
+                                  onChange={(e) => updateStep(index, 'endDate', e.target.value)}
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -536,7 +593,7 @@ export default function ProjectsPage() {
               {projects.map((project) => (
                 <div 
                   key={project.id} 
-                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+                  className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer relative"
                   onClick={() => router.push(`/projects/${project.id}`)}
                 >
                   <div className="flex items-start justify-between mb-4">
@@ -560,6 +617,18 @@ export default function ProjectsPage() {
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(project.status)}`}>
                         {getStatusText(project.status)}
                       </span>
+                      {user?.role === 'ADMIN' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setDeleteProjectId(project.id)
+                          }}
+                          className="p-2 text-red-600 hover:text-red-900 hover:bg-red-50 rounded-full transition-colors"
+                          title="Supprimer le projet"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </div>
                   
@@ -585,6 +654,54 @@ export default function ProjectsPage() {
             </div>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {deleteProjectId && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+            <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+              <div className="mt-3 text-center">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+                  <TrashIcon className="h-6 w-6 text-red-600" />
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mt-4">
+                  Supprimer le projet
+                </h3>
+                <div className="mt-2 px-7 py-3">
+                  <p className="text-sm text-gray-500">
+                    Êtes-vous sûr de vouloir supprimer ce projet ? 
+                    Cette action est irréversible et supprimera toutes les données associées 
+                    (étapes, actions, commentaires, fichiers).
+                  </p>
+                </div>
+                <div className="items-center px-4 py-3">
+                  <div className="flex space-x-3">
+                    <button
+                      onClick={() => setDeleteProjectId(null)}
+                      className="flex-1 btn-secondary"
+                      disabled={isDeleting}
+                    >
+                      Annuler
+                    </button>
+                    <button
+                      onClick={() => handleDeleteProject(deleteProjectId)}
+                      className="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                          Suppression...
+                        </>
+                      ) : (
+                        'Supprimer définitivement'
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   )

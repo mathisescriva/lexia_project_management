@@ -25,7 +25,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })
     }
 
-    const { name, email, password, role, companyId } = await request.json()
+    const { name, email, password, role, companyId, avatar } = await request.json()
 
     if (!name || !email) {
       return NextResponse.json(
@@ -53,6 +53,7 @@ export async function PUT(
       name,
       email,
       role: role || 'CLIENT',
+      avatar: avatar || null,
       companyId: companyId || null
     }
 
@@ -70,6 +71,7 @@ export async function PUT(
         email: true,
         name: true,
         role: true,
+        avatar: true,
         companyId: true,
         company: {
           select: {

@@ -1,235 +1,229 @@
-# 🚀 Guide de Déploiement
+# 🚀 Guide de Déploiement Render - Lexia Onboarding
 
-## Prérequis
+Ce guide détaille le processus de déploiement de l'application Lexia Onboarding sur Render.
 
-- Node.js 18+ installé
-- Base de données SQLite (ou PostgreSQL/MySQL pour la production)
-- Variables d'environnement configurées
+## 📋 Prérequis
 
-## Variables d'environnement
+- Compte Render (gratuit)
+- Repository GitHub connecté
+- Base de données PostgreSQL (fournie par Render)
 
-Créez un fichier `.env.local` avec les variables suivantes :
+## 🔧 Configuration Automatique (Recommandée)
 
+### 1. Connexion du Repository
+
+1. **Connectez-vous à Render** : https://render.com
+2. **Cliquez sur "New +"** → "Blueprint"
+3. **Connectez votre repository GitHub**
+4. **Sélectionnez le repository** `ondboarding`
+5. **Render détectera automatiquement** le fichier `render.yaml`
+
+### 2. Configuration Automatique
+
+Le fichier `render.yaml` configure automatiquement :
+- ✅ **Base de données PostgreSQL** (gratuite)
+- ✅ **Service web Next.js**
+- ✅ **Variables d'environnement**
+- ✅ **Déploiement automatique**
+
+### 3. Variables d'Environnement
+
+Les variables suivantes sont configurées automatiquement :
 ```env
-# Base de données
-DATABASE_URL="file:./dev.db"
-
-# JWT Secret (générez une clé sécurisée)
-JWT_SECRET="votre-secret-jwt-tres-securise"
-
-# Google Drive (optionnel)
-GOOGLE_CLIENT_ID="votre-client-id"
-GOOGLE_CLIENT_SECRET="votre-client-secret"
-GOOGLE_REDIRECT_URI="http://localhost:3000/api/auth/callback/google"
+NODE_ENV=production
+DATABASE_URL=postgresql://... (généré automatiquement)
+JWT_SECRET=... (généré automatiquement)
+NEXTAUTH_URL=https://lexia-onboarding.onrender.com
+NEXTAUTH_SECRET=... (généré automatiquement)
+SEED_PRODUCTION=true
 ```
 
-## Déploiement Automatique
+## 🔧 Configuration Manuelle (Alternative)
 
-### Option 1 : Script de déploiement
+Si vous préférez configurer manuellement :
+
+### 1. Créer la Base de Données
+
+1. **New +** → "PostgreSQL"
+2. **Nom** : `lexia-database`
+3. **Plan** : Free
+4. **Database** : `lexia_production`
+5. **User** : `lexia_user`
+
+### 2. Créer le Service Web
+
+1. **New +** → "Web Service"
+2. **Connecter le repository GitHub**
+3. **Configuration** :
+   - **Name** : `lexia-onboarding`
+   - **Environment** : `Node`
+   - **Build Command** : `npm install && npx prisma generate && npm run build`
+   - **Start Command** : `npm start`
+   - **Plan** : Free
+
+### 3. Variables d'Environnement
+
+Ajouter manuellement :
+```env
+NODE_ENV=production
+DATABASE_URL=postgresql://... (copier depuis la base de données)
+JWT_SECRET=votre-clé-secrète-jwt
+NEXTAUTH_URL=https://votre-app.onrender.com
+NEXTAUTH_SECRET=votre-clé-secrète-nextauth
+SEED_PRODUCTION=true
+```
+
+## 🚀 Processus de Déploiement
+
+### Étapes Automatiques
+
+1. **Installation des dépendances** : `npm install`
+2. **Génération Prisma** : `npx prisma generate`
+3. **Application des migrations** : `npx prisma migrate deploy`
+4. **Seeding de la base** : `npm run db:seed:prod`
+5. **Build de l'application** : `npm run build`
+6. **Démarrage du service** : `npm start`
+
+### Scripts Disponibles
 
 ```bash
-# Déploiement complet avec seeding
-npm run deploy
+# Déploiement complet
+./scripts/render-deploy.sh
 
-# Ou manuellement
-./scripts/deploy.sh
+# Configuration de production
+./scripts/setup-production.sh
+
+# Scripts npm
+npm run build:prod    # Build optimisé pour la production
+npm run start:prod    # Démarrage avec migrations
+npm run db:deploy     # Application des migrations
 ```
 
-### Option 2 : Déploiement manuel
+## 📊 Monitoring et Logs
 
+### Accès aux Logs
+
+1. **Dashboard Render** → Votre service
+2. **Onglet "Logs"**
+3. **Filtres disponibles** :
+   - Build logs
+   - Runtime logs
+   - Error logs
+
+### Métriques Disponibles
+
+- **Uptime** : Disponibilité du service
+- **Response Time** : Temps de réponse
+- **Memory Usage** : Utilisation mémoire
+- **CPU Usage** : Utilisation CPU
+
+## 🔍 Dépannage
+
+### Problèmes Courants
+
+#### 1. Erreur de Base de Données
 ```bash
-# 1. Installer les dépendances
-npm install
-
-# 2. Générer le client Prisma
-npx prisma generate
-
-# 3. Appliquer les migrations
-npx prisma migrate deploy
-
-# 4. Seeding de production (optionnel)
-npm run db:seed:prod
-
-# 5. Build de l'application
-npm run build
-
-# 6. Démarrer en production
-npm start
-```
-
-## Déploiement sur Vercel
-
-### 1. Configuration Vercel
-
-Créez un fichier `vercel.json` :
-
-```json
-{
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "env": {
-    "DATABASE_URL": "@database-url",
-    "JWT_SECRET": "@jwt-secret"
-  }
-}
-```
-
-### 2. Variables d'environnement Vercel
-
-Dans les paramètres de votre projet Vercel :
-
-- `DATABASE_URL` : URL de votre base de données
-- `JWT_SECRET` : Clé secrète JWT
-- `GOOGLE_CLIENT_ID` : ID client Google (optionnel)
-- `GOOGLE_CLIENT_SECRET` : Secret client Google (optionnel)
-
-### 3. Build Hooks
-
-Ajoutez ces hooks dans `package.json` :
-
-```json
-{
-  "scripts": {
-    "vercel-build": "npx prisma generate && npx prisma migrate deploy && npm run build"
-  }
-}
-```
-
-## Déploiement sur Railway
-
-### 1. Configuration Railway
-
-```bash
-# Installer Railway CLI
-npm install -g @railway/cli
-
-# Login
-railway login
-
-# Initialiser le projet
-railway init
-
-# Déployer
-railway up
-```
-
-### 2. Variables d'environnement Railway
-
-Configurez les variables dans le dashboard Railway :
-
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `NODE_ENV=production`
-
-## Déploiement sur Docker
-
-### 1. Dockerfile
-
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm ci --only=production
-
-COPY . .
-RUN npx prisma generate
-RUN npm run build
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
-```
-
-### 2. Docker Compose
-
-```yaml
-version: '3.8'
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - DATABASE_URL=file:./data.db
-      - JWT_SECRET=your-secret
-    volumes:
-      - ./data:/app/data
-```
-
-## Vérification Post-Déploiement
-
-### 1. Vérifier la base de données
-
-```bash
-# Ouvrir Prisma Studio
-npx prisma studio
-
-# Vérifier les migrations
-npx prisma migrate status
-```
-
-### 2. Tester l'API
-
-```bash
-# Test de l'API d'authentification
-curl -X GET https://votre-domaine.com/api/auth/me
-
-# Test de création d'un commentaire
-curl -X POST https://votre-domaine.com/api/comments \
-  -H "Content-Type: application/json" \
-  -d '{"projectId":"test","content":"Test comment"}'
-```
-
-### 3. Comptes par défaut
-
-Après le seeding de production :
-
-- **Admin** : `admin@lexia.com` / `admin123`
-- **⚠️ Important** : Changez le mot de passe admin après le premier login !
-
-## Dépannage
-
-### Erreur "IDs invalides"
-
-1. Vérifiez que les migrations ont été appliquées
-2. Videz le cache du navigateur
-3. Supprimez les cookies de session
-4. Redémarrez l'application
-
-### Erreur de base de données
-
-```bash
-# Réinitialiser la base de données
-npx prisma migrate reset
-
-# Régénérer le client
-npx prisma generate
+# Vérifier la connexion
+npx prisma db execute --stdin <<< "SELECT 1;"
 
 # Appliquer les migrations
 npx prisma migrate deploy
 ```
 
-### Erreur de build
-
+#### 2. Erreur de Build
 ```bash
-# Nettoyer le cache
-rm -rf .next
-rm -rf node_modules/.cache
-
-# Réinstaller les dépendances
+# Nettoyer et rebuilder
+rm -rf node_modules .next
 npm install
-
-# Rebuild
 npm run build
 ```
 
-## Support
+#### 3. Erreur de Variables d'Environnement
+- Vérifier que toutes les variables sont définies
+- Redémarrer le service après modification
 
-Pour toute question ou problème de déploiement, consultez :
+### Commandes de Debug
 
-- [Documentation Prisma](https://www.prisma.io/docs)
-- [Documentation Next.js](https://nextjs.org/docs)
-- [Documentation Vercel](https://vercel.com/docs)
+```bash
+# Vérifier l'état de la base de données
+npx prisma studio
+
+# Vérifier les migrations
+npx prisma migrate status
+
+# Tester la connexion
+npx prisma db execute --stdin <<< "SELECT version();"
+```
+
+## 🔐 Sécurité
+
+### Variables Sensibles
+
+- **JWT_SECRET** : Clé secrète pour les tokens JWT
+- **NEXTAUTH_SECRET** : Clé secrète NextAuth
+- **DATABASE_URL** : URL de connexion PostgreSQL
+
+### Headers de Sécurité
+
+L'application inclut automatiquement :
+- `X-Frame-Options: DENY`
+- `X-Content-Type-Options: nosniff`
+- `Referrer-Policy: origin-when-cross-origin`
+
+## 📈 Optimisations
+
+### Performance
+
+- **Build optimisé** : Next.js standalone
+- **Images optimisées** : Next.js Image component
+- **CSS optimisé** : Tailwind CSS purged
+- **Caching** : Headers de cache appropriés
+
+### Base de Données
+
+- **Index optimisés** : Prisma génère automatiquement
+- **Connexions poolées** : Configuration PostgreSQL
+- **Migrations optimisées** : Déploiement incrémental
+
+## 🔄 Mises à Jour
+
+### Déploiement Automatique
+
+- **Push sur main** → Déploiement automatique
+- **Pull requests** → Déploiement de preview (optionnel)
+
+### Déploiement Manuel
+
+1. **Dashboard Render** → Votre service
+2. **"Manual Deploy"** → "Deploy latest commit"
+
+## 📞 Support
+
+### Logs d'Erreur
+
+En cas de problème, vérifiez :
+1. **Logs de build** dans Render
+2. **Logs runtime** dans Render
+3. **Logs de base de données** dans Render
+
+### Contact
+
+- **Email** : support@lexia.com
+- **Documentation** : Ce fichier
+- **Issues** : Repository GitHub
+
+## 🎯 Checklist de Déploiement
+
+- [ ] Repository connecté à Render
+- [ ] Base de données PostgreSQL créée
+- [ ] Service web configuré
+- [ ] Variables d'environnement définies
+- [ ] Premier déploiement réussi
+- [ ] Base de données seedée
+- [ ] Tests de connexion effectués
+- [ ] Monitoring configuré
+- [ ] Documentation mise à jour
+
+---
+
+**✅ Déploiement réussi !** Votre application est maintenant accessible sur `https://lexia-onboarding.onrender.com`

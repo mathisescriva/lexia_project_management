@@ -37,6 +37,7 @@ async function main() {
       password: adminPassword,
       name: 'Admin Lexia',
       role: 'ADMIN',
+      avatar: '/avatars/avatar_admin.svg',
     },
   })
 
@@ -50,6 +51,7 @@ async function main() {
       password: client1Password,
       name: 'Jean Dupont',
       role: 'CLIENT',
+      avatar: '/avatars/avatar_homme.svg',
       companyId: company1.id,
     },
   })
@@ -63,6 +65,7 @@ async function main() {
       password: client2Password,
       name: 'Marie Martin',
       role: 'CLIENT',
+      avatar: '/avatars/avatar_femme.svg',
       companyId: company2.id,
     },
   })

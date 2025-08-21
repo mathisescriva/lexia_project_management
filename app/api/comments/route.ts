@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
       where: { projectId },
       include: {
         user: {
-          select: { id: true, name: true, role: true }
+          select: { id: true, name: true, role: true, avatar: true }
         }
       },
       orderBy: { createdAt: 'desc' }
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       },
       include: {
         user: {
-          select: { id: true, name: true, role: true }
+          select: { id: true, name: true, role: true, avatar: true }
         }
       }
     })
