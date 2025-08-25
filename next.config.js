@@ -42,15 +42,23 @@ const nextConfig = {
       },
     ]
   },
+
+
   
   // Optimisations de build
   experimental: {
-    optimizeCss: true,
+    // Désactivé pour éviter les problèmes de build
+    // optimizeCss: true,
   },
   
   // Configuration pour Render
   env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
+    // Variables d'environnement personnalisées si nécessaire
+  },
+
+  // Configuration pour éviter les erreurs de génération statique
+  generateBuildId: async () => {
+    return 'build-' + Date.now()
   },
 }
 

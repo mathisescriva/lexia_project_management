@@ -103,7 +103,7 @@ export default function UsersPage() {
 
       if (response.ok) {
         toast.success(editingUser ? 'Utilisateur modifié avec succès!' : 'Utilisateur créé avec succès!')
-        setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '' })
+        setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '', avatar: '' })
         setShowForm(false)
         setEditingUser(null)
         fetchUsers()
@@ -180,7 +180,7 @@ export default function UsersPage() {
                       <button
               onClick={() => {
                 setEditingUser(null)
-                setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '' })
+                setFormData({ name: '', email: '', password: '', role: 'CLIENT', companyId: '', avatar: '' })
                 setShowForm(true)
               }}
               className="btn-primary flex items-center"
