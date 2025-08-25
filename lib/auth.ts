@@ -2,7 +2,8 @@ import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { prisma } from './prisma'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'lexia-production-jwt-secret-key-2025'
+// Utiliser une clé fixe pour la production si JWT_SECRET n'est pas configuré
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' ? 'lexia-production-jwt-secret-key-2025' : 'your-secret-key')
 
 export interface JWTPayload {
   userId: string
@@ -19,6 +20,10 @@ export async function verifyPassword(password: string, hashedPassword: string): 
 }
 
 export function generateToken(payload: JWTPayload): string {
+  // Log pour debug en production
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🔐 Génération de token avec JWT_SECRET:', JWT_SECRET.substring(0, 20) + '...')
+  }
   return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' })
 }
 
