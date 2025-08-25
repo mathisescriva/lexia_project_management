@@ -21,6 +21,7 @@
     "deploy:render": "./scripts/render-deploy.sh",
     "check:env": "./scripts/check-production-env.sh",
     "setup:prod": "./scripts/setup-production.sh",
+    "deploy:status": "./scripts/deploy-status.sh",
     "postinstall": "npx prisma generate"
   },
   "dependencies": {

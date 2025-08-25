@@ -3,6 +3,15 @@ const nextConfig = {
   // Optimisations pour la production
   output: 'standalone',
   
+  // Configuration des alias de chemins
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname),
+    }
+    return config
+  },
+  
   // Configuration des images
   images: {
     domains: ['localhost'],
