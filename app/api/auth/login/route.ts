@@ -47,6 +47,13 @@ export async function POST(request: NextRequest) {
     return response
   } catch (error) {
     console.error('Login error:', error)
+    
+    // Log plus détaillé pour le debugging
+    if (error instanceof Error) {
+      console.error('Error details:', error.message)
+      console.error('Error stack:', error.stack)
+    }
+    
     return NextResponse.json(
       { error: 'Erreur interne du serveur' },
       { status: 500 }
