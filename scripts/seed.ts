@@ -232,8 +232,8 @@ async function main() {
   // Create tickets
   await prisma.ticket.create({
     data: {
-      subject: 'Question sur le design',
-      message: 'Bonjour, j\'aimerais savoir si nous pouvons modifier la couleur principale du site ?',
+      title: 'Question sur le design',
+      description: 'Bonjour, j\'aimerais savoir si nous pouvons modifier la couleur principale du site ?',
       priority: 'MEDIUM',
       userId: client1.id,
       projectId: project1.id,
@@ -242,8 +242,8 @@ async function main() {
 
   await prisma.ticket.create({
     data: {
-      subject: 'Problème de connexion',
-      message: 'Je n\'arrive pas à me connecter à l\'espace client depuis hier.',
+      title: 'Problème de connexion',
+      description: 'Je n\'arrive pas à me connecter à l\'espace client depuis hier.',
       priority: 'HIGH',
       userId: client2.id,
     },

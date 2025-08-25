@@ -84,15 +84,15 @@ export async function GET(request: NextRequest) {
     const ticketWhere = user.role === 'ADMIN'
       ? {
           OR: [
-            { subject: { contains: query } },
-            { message: { contains: query } }
+            { title: { contains: query } },
+            { description: { contains: query } }
           ]
         }
       : {
           userId: user.id,
           OR: [
-            { subject: { contains: query } },
-            { message: { contains: query } }
+            { title: { contains: query } },
+            { description: { contains: query } }
           ]
         }
 

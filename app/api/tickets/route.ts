@@ -98,19 +98,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 })
     }
 
-    const { subject, message, projectId, priority } = await request.json()
+    const { title, description, projectId, priority } = await request.json()
 
-    if (!subject || !message) {
+    if (!title || !description) {
       return NextResponse.json(
-        { error: 'Sujet et message requis' },
+        { error: 'Titre et description requis' },
         { status: 400 }
       )
     }
 
     const ticket = await prisma.ticket.create({
       data: {
-        subject,
-        message,
+        title,
+        description,
         priority: priority || 'MEDIUM',
         userId: user.id,
         projectId: projectId || null

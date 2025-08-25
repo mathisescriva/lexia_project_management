@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
     // Créer un ticket de contact
     const ticket = await prisma.ticket.create({
       data: {
-        subject: `[CONTACT] ${subject.trim()}`,
-        message: message.trim(),
+        title: `[CONTACT] ${subject.trim()}`,
+        description: message.trim(),
         priority: 'MEDIUM',
         status: 'OPEN',
         userId: user.id,

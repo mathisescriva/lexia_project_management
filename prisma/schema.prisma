@@ -33,11 +33,12 @@ model User {
 }
 
 model Company {
-  id        String   @id @default(cuid())
-  name      String   @unique
-  logo      String?  // URL du logo
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?  // Description de l'entreprise
+  logo        String?  // URL du logo
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
   users    User[]
