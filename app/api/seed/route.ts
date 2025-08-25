@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,11 +24,12 @@ export async function POST(request: NextRequest) {
     console.log('🌱 Début du seeding en production...')
 
     // Créer l'administrateur
+    const adminPassword = await bcrypt.hash('admin123', 10)
     const admin = await prisma.user.create({
       data: {
         name: 'Administrateur Lexia',
         email: 'admin@lexia.com',
-        password: '$2a$10$rQZ8K9mN2pL1vX3yJ6hF8eS4tU7wA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2x',
+        password: adminPassword,
         role: 'ADMIN',
         avatar: '/avatars/avatar_homme.svg'
       }
@@ -51,11 +53,12 @@ export async function POST(request: NextRequest) {
     })
 
     // Créer les clients
+    const clientPassword = await bcrypt.hash('client123', 10)
     const client1 = await prisma.user.create({
       data: {
         name: 'Jean Dupont',
         email: 'client1@example.com',
-        password: '$2a$10$rQZ8K9mN2pL1vX3yJ6hF8eS4tU7wA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2x',
+        password: clientPassword,
         role: 'CLIENT',
         companyId: company1.id,
         avatar: '/avatars/avatar_homme.svg'
@@ -66,7 +69,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: 'Marie Martin',
         email: 'client2@example.com',
-        password: '$2a$10$rQZ8K9mN2pL1vX3yJ6hF8eS4tU7wA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2x',
+        password: clientPassword,
         role: 'CLIENT',
         companyId: company2.id,
         avatar: '/avatars/avatar_femme.svg'
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
       data: {
         name: 'Pierre Durand',
         email: 'client@promemoria.com',
-        password: '$2a$10$rQZ8K9mN2pL1vX3yJ6hF8eS4tU7wA1bC2dE3fG4hI5jK6lM7nO8pQ9rS0tU1vW2x',
+        password: clientPassword,
         role: 'CLIENT',
         companyId: company2.id,
         avatar: '/avatars/avatar_homme.svg'
